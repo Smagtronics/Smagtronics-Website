@@ -1,25 +1,543 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.ico" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Smagtronics: Smart Automation Group</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-  <script type="importmap">
-{
-  "imports": {
-    "react-router-dom": "https://aistudiocdn.com/react-router-dom@^7.9.4",
-    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/",
-    "react/": "https://aistudiocdn.com/react@^19.2.0/",
-    "react": "https://aistudiocdn.com/react@^19.2.0"
-  }
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Smagtronics — SmagWell & SmagRack</title>
+<meta name="description" content="Smagtronics — enterprise power & rack systems for hospitals and data centers. SmagWell (power & redundancy) and SmagRack (rack, cooling & cable management)." />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --bg: #0f1724;
+  --card: linear-gradient(135deg,#0f1724 0%, #0b1220 100%);
+  --accent: #00d4ff;
+  --accent-2: #6a8cff;
+  --muted: #9aa7bf;
+  --glass: rgba(255,255,255,0.04);
+  --glass-2: rgba(255,255,255,0.02);
+  --success: #2dd4bf;
+  --danger: #ff6b6b;
+  font-family: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  color-scheme: dark;
 }
-</script>
-<link rel="stylesheet" href="/index.css">
+
+*{box-sizing: border-box}
+html,body{height:100%}
+body{
+  margin:0;
+  background: radial-gradient(1200px 400px at 10% 10%, rgba(106,140,255,0.06), transparent 10%),
+              radial-gradient(900px 300px at 90% 80%, rgba(0,212,255,0.03), transparent 10%),
+              var(--bg);
+  color:#e6eef8;
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+  line-height:1.45;
+  padding-bottom:80px;
+}
+
+/* Layout */
+.container{max-width:1180px;margin:0 auto;padding:28px}
+.header{
+  display:flex;align-items:center;gap:18px;justify-content:space-between;padding:14px 0;
+}
+.brand{
+  display:flex;gap:14px;align-items:center;
+}
+.logo{
+  width:60px;height:60px;border-radius:10px;
+  background:linear-gradient(135deg,var(--accent),var(--accent-2));
+  display:grid;place-items:center;font-weight:800;color:#021026;font-size:20px;
+  box-shadow:0 8px 30px rgba(6,9,18,0.6), inset 0 -6px 18px rgba(255,255,255,0.06);
+}
+.brand h1{margin:0;font-size:18px;letter-spacing:0.2px}
+.nav{display:flex;gap:12px;align-items:center}
+.nav a{color:var(--muted);text-decoration:none;padding:8px 12px;border-radius:8px;font-weight:600}
+.nav a:hover{color:#e6f8ff;background:var(--glass);text-decoration:none}
+
+.hero{
+  display:grid;grid-template-columns:1fr 420px;gap:28px;align-items:center;padding:28px 0;
+}
+.hero-left h2{font-size:32px;margin:0 0 8px}
+.hero-left p{color:var(--muted);margin:0 0 18px}
+.cta-row{display:flex;gap:12px;align-items:center}
+.btn{
+  background:linear-gradient(90deg,var(--accent),var(--accent-2));
+  color:#021026;padding:12px 18px;border-radius:10px;font-weight:700;border:none;cursor:pointer;
+  box-shadow:0 8px 30px rgba(6,9,18,0.6);
+}
+.btn.ghost{background:transparent;color:var(--accent);border:1px solid rgba(106,140,255,0.14)}
+.badge{background:rgba(255,255,255,0.04);padding:8px;border-radius:10px;color:var(--muted);font-weight:600}
+
+/* Right panel - product switcher */
+.switcher{
+  background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+  padding:20px;border-radius:14px;border:1px solid rgba(255,255,255,0.03);backdrop-filter: blur(6px);
+}
+.brand-tabs{display:flex;gap:8px;margin-bottom:14px}
+.tab{flex:1;text-align:center;padding:10px;border-radius:10px;color:var(--muted);cursor:pointer;font-weight:700}
+.tab.active{background:linear-gradient(90deg, rgba(0,212,255,0.06), rgba(106,140,255,0.04));color:white;box-shadow:inset 0 -2px 6px rgba(0,0,0,0.4)}
+.product-card{display:grid;grid-template-columns:1fr 120px;gap:14px;align-items:center}
+.product-card .info h3{margin:0;font-size:16px}
+.small{font-size:13px;color:var(--muted);margin-top:6px}
+.specs{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+.spec{display:flex;justify-content:space-between;color:var(--muted);font-weight:700}
+
+/* Features grid */
+.features{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:26px 0}
+.feature{background:linear-gradient(180deg, rgba(255,255,255,0.015), transparent);padding:16px;border-radius:12px;border:1px solid rgba(255,255,255,0.02)}
+.feature h4{margin:0 0 8px}
+.feature p{margin:0;color:var(--muted);font-size:14px}
+
+/* Product showcase */
+.products{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin:20px 0}
+.card{
+  background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+  border-radius:14px;padding:18px;border:1px solid rgba(255,255,255,0.03);
+  transition: transform .25s ease, box-shadow .25s ease;
+}
+.card:hover{transform:translateY(-8px);box-shadow:0 18px 40px rgba(3,6,18,0.6)}
+.card .title{display:flex;justify-content:space-between;align-items:center}
+.card h3{margin:0;font-size:16px}
+.price{font-weight:800;color:var(--accent)}
+.card p{color:var(--muted);font-size:13px;margin:10px 0}
+.tags{display:flex;gap:8px;flex-wrap:wrap}
+.tag{font-size:12px;padding:6px 8px;border-radius:8px;background:var(--glass);color:var(--muted)}
+
+/* Specs table */
+.spec-table{width:100%;border-collapse:collapse;margin-top:12px;font-size:13px}
+.spec-table th{background:rgba(255,255,255,0.02);text-align:left;padding:10px;border-bottom:1px solid rgba(255,255,255,0.03);font-weight:700}
+.spec-table td{padding:10px;border-bottom:1px solid rgba(255,255,255,0.03);color:var(--muted)}
+
+/* CTA strip */
+.cta-strip{display:flex;justify-content:space-between;align-items:center;padding:18px;border-radius:12px;background:linear-gradient(90deg, rgba(106,140,255,0.06), rgba(0,212,255,0.03));margin-top:26px}
+
+/* Contact & Footer */
+.contact-section{display:grid;grid-template-columns:1fr 420px;gap:22px;margin-top:26px}
+.form{background:var(--glass);padding:18px;border-radius:12px;border:1px solid rgba(255,255,255,0.02)}
+.input{width:100%;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit;margin-bottom:10px}
+.textarea{min-height:120px;resize:vertical}
+.form .row{display:flex;gap:8px}
+.small-muted{font-size:13px;color:var(--muted)}
+
+footer{margin-top:36px;color:var(--muted);display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;padding-top:18px;border-top:1px solid rgba(255,255,255,0.02)}
+
+/* Responsive */
+@media (max-width:1000px){
+  .hero{grid-template-columns:1fr}
+  .products{grid-template-columns:repeat(2,1fr)}
+  .features{grid-template-columns:repeat(2,1fr)}
+  .contact-section{grid-template-columns:1fr}
+}
+@media (max-width:640px){
+  .products{grid-template-columns:1fr}
+  .features{grid-template-columns:1fr}
+  .header{flex-direction:column;align-items:flex-start;gap:12px}
+  .brand h1{font-size:16px}
+  .hero-left h2{font-size:26px}
+  .switcher{padding:14px}
+}
+
+/* subtle animated icons */
+.pulse{
+  width:12px;height:12px;border-radius:50%;
+  background:var(--accent);
+  box-shadow:0 0 18px rgba(0,212,255,0.18);
+  animation:pulse 2.6s infinite;
+}
+@keyframes pulse{
+  0%{transform:scale(.92);opacity:0.9}
+  50%{transform:scale(1.18);opacity:0.6}
+  100%{transform:scale(.92);opacity:0.9}
+}
+</style>
 </head>
-  <body class="bg-gray-50 dark:bg-slate-900 text-slate-800 dark:text-gray-200">
-    <div id="root"></div>
-    <script type="module" src="/index.tsx"></script>
-  </body>
+<body>
+<div class="container">
+  <header class="header" role="banner">
+    <div class="brand">
+      <div class="logo" aria-hidden="true">ST</div>
+      <div>
+        <h1>Smagtronics</h1>
+        <div class="small-muted">Precision power & rack systems for hospitals & data centers</div>
+      </div>
+    </div>
+
+    <nav class="nav" role="navigation" aria-label="Primary">
+      <a href="#products">Products</a>
+      <a href="#solutions">Solutions</a>
+      <a href="#contact">Contact</a>
+      <a href="#brochure" class="badge">Download Brochure</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero" aria-labelledby="hero-heading">
+      <div class="hero-left">
+        <h2 id="hero-heading">Smagtronics — uptime, safety & modularity.</h2>
+        <p>SmagWell power systems and SmagRack rack & cooling solutions are engineered for hospital critical care rooms and high-density data centers. Redundancy, compliance, and cable hygiene — built for technicians who demand reliable hardware.</p>
+        <div class="cta-row">
+          <button class="btn" id="cta-request">Request a Demo</button>
+          <button class="btn ghost" id="cta-specs">View Full Specs</button>
+          <div class="badge">ISO 9001 • IEC 62368</div>
+        </div>
+
+        <div style="margin-top:18px;display:flex;gap:12px;align-items:center;">
+          <div class="pulse" aria-hidden="true"></div>
+          <div class="small-muted">Deployed in 120+ hospitals and colocation rooms worldwide</div>
+        </div>
+      </div>
+
+      <aside class="switcher" aria-label="Product quick view">
+        <div class="brand-tabs" role="tablist" aria-label="Brands">
+          <div class="tab active" data-brand="smagwell" role="tab" aria-selected="true">SmagWell</div>
+          <div class="tab" data-brand="smagrack" role="tab">SmagRack</div>
+        </div>
+
+        <div id="quick-smagwell" class="product-card" role="tabpanel">
+          <div class="info">
+            <h3>SmagWell 60kVA N+1</h3>
+            <div class="small">Modular UPS with hot-swap batteries and smart BMS for clinical & rack room use.</div>
+
+            <div class="specs" aria-hidden="false">
+              <div class="spec"><span>Redundancy</span><span>N+1, parallelable</span></div>
+              <div class="spec"><span>Efficiency</span><span>Up to 96.7%</span></div>
+              <div class="spec"><span>Interfaces</span><span>SNMP, Modbus, HTTPs</span></div>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:10px;align-items:center;">
+            <svg width="108" height="108" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <rect x="1.5" y="3" width="21" height="18" rx="2.5" stroke="url(#g)" stroke-width="1.2" fill="rgba(255,255,255,0.02)"/>
+              <path d="M6 8h12" stroke="rgba(255,255,255,0.3)" stroke-width="1.2" stroke-linecap="round"/>
+              <path d="M8 15h8" stroke="rgba(0,212,255,0.9)" stroke-width="1.6" stroke-linecap="round"/>
+              <defs><linearGradient id="g" x1="0" x2="1"><stop offset="0" stop-color="#00d4ff"/><stop offset="1" stop-color="#6a8cff"/></linearGradient></defs>
+            </svg>
+            <div class="small-muted">Quick spec</div>
+            <div class="small muted price" style="font-size:14px;color:var(--accent)">Enterprise grade</div>
+          </div>
+        </div>
+
+        <div id="quick-smagrack" class="product-card" style="display:none" role="tabpanel" aria-hidden="true">
+          <div class="info">
+            <h3>SmagRack Pro 42U</h3>
+            <div class="small">High-density rack with passive & active airflow options, integrated cable manager & rail lock.</div>
+
+            <div class="specs">
+              <div class="spec"><span>Load</span><span>1200kg static</span></div>
+              <div class="spec"><span>Cooling</span><span>Optional rear intake / front exhaust</span></div>
+              <div class="spec"><span>Security</span><span>Smart locks & tamper detection</span></div>
+            </div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:10px;align-items:center;">
+            <svg width="108" height="108" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <rect x="4" y="3" width="16" height="18" rx="1.8" stroke="url(#g2)" stroke-width="1.2" fill="rgba(255,255,255,0.02)"/>
+              <path d="M8 8h8M8 12h8M8 16h8" stroke="rgba(255,255,255,0.2)" stroke-width="1.2" stroke-linecap="round"/>
+              <defs><linearGradient id="g2" x1="0" x2="1"><stop offset="0" stop-color="#00d4ff"/><stop offset="1" stop-color="#6a8cff"/></linearGradient></defs>
+            </svg>
+            <div class="small-muted">Quick spec</div>
+            <div class="small price" style="font-size:14px;color:var(--accent)">Rack optimized</div>
+          </div>
+        </div>
+
+        <div style="margin-top:12px">
+          <button class="btn" id="switch-cta">Compare models</button>
+          <button class="btn ghost" id="brochure" style="margin-left:8px">Download Brochure</button>
+        </div>
+      </aside>
+    </section>
+
+    <!-- Features -->
+    <section id="solutions" aria-labelledby="solutions-heading">
+      <h2 id="solutions-heading" style="margin-top:2px">Solutions for Hospitals & Data Centers</h2>
+      <p class="small-muted">Engineered to meet uptime SLAs, safety regulations and technician ergonomics.</p>
+
+      <div class="features">
+        <div class="feature">
+          <h4>Clinical-grade Power</h4>
+          <p>Redundant UPS topologies, isolated outputs and medical-grade filtering to protect life-supporting equipment and reduce EMI risk.</p>
+        </div>
+        <div class="feature">
+          <h4>High-density Rack Systems</h4>
+          <p>42U, 48U and custom enclosures with integrated cable pathways, airflow management and quick-release rails for fast serviceability.</p>
+        </div>
+        <div class="feature">
+          <h4>Monitoring & Integration</h4>
+          <p>SNMP, Modbus TCP, REST APIs and secure cloud telemetry provide real-time alerts, audit logs and automated failover scripts.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Products -->
+    <section id="products" aria-labelledby="products-heading">
+      <h2 id="products-heading">Products</h2>
+      <p class="small-muted">A curated selection of our most demanded models for critical rooms and colocation spaces.</p>
+
+      <div class="products" role="list">
+        <!-- SmagWell card -->
+        <article class="card" role="listitem" aria-labelledby="p1">
+          <div class="title">
+            <h3 id="p1">SmagWell 20kVA - Rackmount</h3>
+            <div class="price">20kVA</div>
+          </div>
+          <p>Compact, rackmountable UPS with hot-swappable battery modules. Short transfer time, advanced BMS and 3-phase input support.</p>
+          <div class="tags">
+            <div class="tag">N+1</div><div class="tag">SNMP</div><div class="tag">Hot-swap</div>
+          </div>
+          <table class="spec-table" aria-hidden="true">
+            <tr><th>Input</th><td>3-phase 380V</td></tr>
+            <tr><th>Output</th><td>Single/Three-phase selectable</td></tr>
+            <tr><th>Battery</th><td>Li-ion / VRLA options</td></tr>
+          </table>
+        </article>
+
+        <!-- SmagWell large -->
+        <article class="card" role="listitem" aria-labelledby="p2">
+          <div class="title">
+            <h3 id="p2">SmagWell 60kVA - Modular</h3>
+            <div class="price">60kVA</div>
+          </div>
+          <p>Scalable modules, parallelable, with precision load sharing and remote firmware updates for minimal downtime maintenance.</p>
+          <div class="tags">
+            <div class="tag">Parallelable</div><div class="tag">BMS</div><div class="tag">96%+</div>
+          </div>
+          <table class="spec-table" aria-hidden="true">
+            <tr><th>MTBF</th><td>>250,000 hours</td></tr>
+            <tr><th>Warranty</th><td>5 years (extendable)</td></tr>
+            <tr><th>Comms</th><td>SNMP, Modbus, HTTPS</td></tr>
+          </table>
+        </article>
+
+        <!-- SmagRack -->
+        <article class="card" role="listitem" aria-labelledby="p3">
+          <div class="title">
+            <h3 id="p3">SmagRack Pro 42U</h3>
+            <div class="price">42U</div>
+          </div>
+          <p>Optimized for cable hygiene, supports integrated PDUs, airflow baffles, and secure front/rear locking systems with optional sensors.</p>
+          <div class="tags">
+            <div class="tag">Cable mgmt</div><div class="tag">Smart locks</div><div class="tag">1200kg</div>
+          </div>
+          <table class="spec-table" aria-hidden="true">
+            <tr><th>Dimensions</th><td>600mm x 1200mm x 2000mm</td></tr>
+            <tr><th>Options</th><td>Blanking panels, PDU rails, fan trays</td></tr>
+            <tr><th>Colors</th><td>Black / Hospital White</td></tr>
+          </table>
+        </article>
+      </div>
+
+      <div style="margin-top:18px;display:flex;gap:12px;align-items:center;">
+        <button class="btn" id="view-more">Explore full portfolio</button>
+        <div class="small-muted">Want a custom configuration? <a href="#contact" style="color:var(--accent)">Contact our engineers</a></div>
+      </div>
+    </section>
+
+    <!-- Specs & deep dive -->
+    <section style="margin-top:20px">
+      <h3>Technical deep dive — SmagWell 60kVA</h3>
+      <p class="small-muted">A typical configuration used in critical hospital backend rooms.</p>
+      <table class="spec-table" role="table">
+        <thead>
+          <tr><th>Parameter</th><th>Typical value</th><th>Notes</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Topology</td><td>Online double-conversion</td><td>Zero break transfer, active load sharing</td></tr>
+          <tr><td>Efficiency</td><td>Up to 96.7%</td><td>Economy mode supported for non-critical loads</td></tr>
+          <tr><td>Battery options</td><td>VRLA / Li-ion</td><td>Hot-swap module supports service without shutdown</td></tr>
+          <tr><td>Interfaces</td><td>SNMPv3, Modbus TCP, HTTPS API</td><td>Integrates with NMS and DCIM</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- CTA strip -->
+    <div class="cta-strip" style="margin-top:18px">
+      <div>
+        <strong style="display:block">Need help selecting systems?</strong>
+        <div class="small-muted">Tell us your power & rack constraints and we’ll propose a fully redundant design.</div>
+      </div>
+      <div style="display:flex;gap:10px;align-items:center">
+        <button class="btn" id="cta-design">Request Design</button>
+        <button class="btn ghost" id="cta-chat">Chat with Sales</button>
+      </div>
+    </div>
+
+    <!-- Contact -->
+    <section id="contact" style="margin-top:22px">
+      <h2>Contact</h2>
+      <p class="small-muted">Talk to our field engineers or request site assessment.</p>
+
+      <div class="contact-section">
+        <form class="form" id="contact-form" novalidate>
+          <label class="small-muted">Name<input class="input" type="text" id="name" placeholder="Full name" required></label>
+          <label class="small-muted">Company<input class="input" type="text" id="company" placeholder="Hospital / Data center"></label>
+          <div class="row">
+            <label class="small-muted" style="flex:1">Email<input class="input" type="email" id="email" placeholder="you@company.com" required></label>
+            <label class="small-muted" style="flex:1">Phone<input class="input" type="tel" id="phone" placeholder="+1 555 555 5555"></label>
+          </div>
+          <label class="small-muted">Message<textarea class="input textarea" id="message" placeholder="Tell us about your room size, load, and preferred deployment" required></textarea></label>
+
+          <div style="display:flex;gap:8px;align-items:center;margin-top:8px;">
+            <button class="btn" type="submit">Send Request</button>
+            <button class="btn ghost" type="button" id="clear-form">Clear</button>
+            <div id="form-msg" style="margin-left:10px;color:var(--success);font-weight:700;display:none">Sent ✓</div>
+          </div>
+
+          <div style="margin-top:12px" class="small-muted">
+            By sending you agree to our <a href="#" style="color:var(--accent)">privacy policy</a>.
+          </div>
+        </form>
+
+        <aside style="padding:18px;background:var(--glass-2);border-radius:12px;border:1px solid rgba(255,255,255,0.02)">
+          <h4>Office</h4>
+          <div class="small-muted">Smagtronics HQ — 123 Tech Lane, Mumbai, India</div>
+          <div style="margin-top:10px">
+            <strong>Support</strong><div class="small-muted">support@smagtronics.example • +91 22 5555 1212</div>
+          </div>
+
+          <h4 style="margin-top:12px">Quick links</h4>
+          <div style="display:flex;flex-direction:column;gap:8px;margin-top:8px">
+            <a href="#products" class="small-muted" style="color:var(--accent)">Full product catalog</a>
+            <a href="#" class="small-muted" style="color:var(--accent)">Compliance & certifications</a>
+            <a href="#" class="small-muted" style="color:var(--accent)">Warranty & SLA</a>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <footer>
+      <div>© <strong>Smagtronics</strong> — Designed for uptime</div>
+      <div class="small-muted">Made for hospitals & data centers • <span style="color:var(--muted)">Privacy</span> • <span style="color:var(--muted)">Terms</span></div>
+    </footer>
+  </main>
+</div>
+
+<script>
+/* Interactivity: product tabs, brochure generation, contact form validation + simulate send */
+(function(){
+  // Tab switching
+  const tabs = document.querySelectorAll('.tab');
+  tabs.forEach(t=>{
+    t.addEventListener('click', ()=>{
+      tabs.forEach(x=>x.classList.remove('active'));
+      t.classList.add('active');
+      const brand = t.dataset.brand;
+      // show/hide quick panels
+      document.getElementById('quick-smagwell').style.display = brand === 'smagwell' ? 'grid' : 'none';
+      document.getElementById('quick-smagrack').style.display = brand === 'smagrack' ? 'grid' : 'none';
+      // accessibility
+      document.getElementById('quick-smagwell').setAttribute('aria-hidden', brand !== 'smagwell');
+      document.getElementById('quick-smagrack').setAttribute('aria-hidden', brand !== 'smagrack');
+    });
+  });
+
+  // Brochure download: create a dynamic PDF-like text file (simulation). In real site, link to actual PDF.
+  function buildBrochureText(){
+    const now = new Date().toLocaleString();
+    return [
+      'Smagtronics — Product Brochure',
+      'Generated: ' + now,
+      '',
+      'Brands: SmagWell (power systems), SmagRack (rack & cooling)',
+      '',
+      'SmagWell 20kVA — rackmount',
+      '- Compact UPS, hot-swappable batteries',
+      '',
+      'SmagWell 60kVA — modular',
+      '- Parallelable, N+1, remote management (SNMP, Modbus, HTTPS)',
+      '',
+      'SmagRack Pro 42U',
+      '- Cable management, optional fan trays, smart locks',
+      '',
+      'Contact: support@smagtronics.example | +91 22 5555 1212'
+    ].join('\\n');
+  }
+
+  function triggerDownload(filename, content){
+    const blob = new Blob([content], {type: 'text/plain'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(()=>{ URL.revokeObjectURL(url); a.remove(); }, 1500);
+  }
+
+  document.getElementById('brochure').addEventListener('click', (e)=>{
+    e.preventDefault();
+    const txt = buildBrochureText();
+    triggerDownload('Smagtronics_brochure.txt', txt);
+    // Quick UX
+    const b = e.currentTarget;
+    b.textContent = 'Downloaded ✓';
+    setTimeout(()=>b.textContent = 'Download Brochure', 2000);
+  });
+
+  // CTA buttons hook
+  document.getElementById('cta-request').addEventListener('click', ()=> {
+    document.getElementById('name').focus();
+    window.scrollTo({top:document.getElementById('contact').offsetTop - 40, behavior:'smooth'});
+  });
+  document.getElementById('cta-specs').addEventListener('click', ()=> {
+    window.location.hash = '#products';
+  });
+  document.getElementById('switch-cta').addEventListener('click', ()=> {
+    window.location.hash = '#products';
+  });
+  document.getElementById('view-more').addEventListener('click', ()=> {
+    alert('We can provide tailored configurations — request a demo or contact sales.');
+  });
+
+  // Contact form validation & simulated send
+  const form = document.getElementById('contact-form');
+  const formMsg = document.getElementById('form-msg');
+  form.addEventListener('submit', function(e){
+    e.preventDefault();
+    // simple client-side validation
+    const name = document.getElementById('name'), email = document.getElementById('email'), message = document.getElementById('message');
+    let ok = true;
+    [name,email,message].forEach(f=>{
+      f.style.outline = '';
+      if(!f.value.trim()){
+        f.style.outline = '2px solid rgba(255,107,107,0.18)';
+        ok = false;
+      }
+    });
+    if(!ok){
+      formMsg.style.display = 'block'; formMsg.style.color = 'var(--danger)'; formMsg.textContent = 'Please fill required fields';
+      setTimeout(()=>{ formMsg.style.display = 'none' }, 3500);
+      return;
+    }
+    // simulate send
+    formMsg.style.display = 'block'; formMsg.style.color = 'var(--success)'; formMsg.textContent = 'Sending...';
+    // simulate network time
+    setTimeout(()=>{
+      formMsg.textContent = 'Sent ✓';
+      // clear form
+      form.reset();
+      setTimeout(()=>formMsg.style.display = 'none', 2500);
+    }, 1000);
+  });
+
+  // clear form
+  document.getElementById('clear-form').addEventListener('click', ()=>{
+    form.reset();
+    document.getElementById('form-msg').style.display = 'none';
+  });
+
+  // small accessibility: keyboard toggle for tabs
+  tabs.forEach(tab=>{
+    tab.addEventListener('keydown', (ev)=>{
+      if(ev.key === 'ArrowRight' || ev.key === 'ArrowLeft'){
+        ev.preventDefault();
+        const all = Array.from(tabs);
+        let i = all.indexOf(tab);
+        i = ev.key === 'ArrowRight' ? (i+1)%all.length : (i-1+all.length)%all.length;
+        all[i].click();
+        all[i].focus();
+      }
+    });
+  });
+
+})();
+</script>
+</body>
 </html>
